@@ -3673,14 +3673,15 @@ mlfi_eom(SMFICTX *ctx)
 						arfound += 1;
 						if (arfound > 1)
 						{
-							arc_set_cv(afc->mctx_arcmsg,
-							           ARC_CHAIN_FAIL);
-
+							/* Assume that AR headers are being processed by
+							* the most recent first. If a message is transitioning
+							* between multiple systems in the same authserv-id then
+							* use the most recent one and skip the rest. */
 							if (conf->conf_dolog)
 							{
 								syslog(LOG_INFO,
-								       "%s: chain state forced to \"fail\" due to multiple results present",
-								       afc->mctx_jobid);
+									"%s: ignoring earlier authentication-results %s in same authserv-id",
+									afc->mctx_jobid, ares_getresult(ar.ares_result[n].result_result));
 							}
 
 							continue;
