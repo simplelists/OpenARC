@@ -3680,8 +3680,9 @@ mlfi_eom(SMFICTX *ctx)
 							if (conf->conf_dolog)
 							{
 								syslog(LOG_INFO,
-									"%s: ignoring earlier authentication-results %s in same authserv-id",
-									afc->mctx_jobid, ares_getresult(ar.ares_result[n].result_result));
+								       "%s: ignoring earlier authentication-results %s in same authserv-id",
+								       afc->mctx_jobid,
+								       ares_getresult(ar.ares_result[n].result_result));
 							}
 
 							continue;
