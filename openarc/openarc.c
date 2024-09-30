@@ -3673,10 +3673,10 @@ mlfi_eom(SMFICTX *ctx)
 						arfound += 1;
 						if (arfound > 1)
 						{
-							/* Assume that AR headers are being processed by
-							* the most recent first. If a message is transitioning
-							* between multiple systems in the same authserv-id then
-							* use the most recent one and skip the rest. */
+							/*  Assume that AR headers are being processed by
+							**  the most recent first. We trust only the most
+							**  recent one and skip the rest.
+							*/
 							if (conf->conf_dolog)
 							{
 								syslog(LOG_INFO,
