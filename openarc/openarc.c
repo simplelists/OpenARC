@@ -3662,6 +3662,26 @@ mlfi_eom(SMFICTX *ctx)
 				{
 					if (ar.ares_result[n].result_method == ARES_METHOD_ARC)
 					{
+						if (BITSET(ARC_MODE_VERIFY, cc->cctx_mode))
+						{
+							/*
+							**  On signing after verify mode, we use our
+							**  own ARC validation result and should not
+							**  trust any other ARC result in AR headers.
+							*/
+							if (conf->conf_dolog)
+							{
+								syslog(LOG_INFO,
+								       "%s: ignoring ARC result %s found in "
+								       "authentication-results with our "
+								       "authserv-id",
+								       afc->mctx_jobid,
+								       ares_getresult(ar.ares_result[n]
+								                      .result_result));
+							}
+							continue;
+						}
+
 						/*
 						**  If it's an ARC result under
 						**  our authserv-id, use that
