@@ -3662,6 +3662,26 @@ mlfi_eom(SMFICTX *ctx)
 				{
 					if (ar.ares_result[n].result_method == ARES_METHOD_ARC)
 					{
+						if (BITSET(ARC_MODE_VERIFY, cc->cctx_mode))
+						{
+							/*
+							**  On signing after verify mode, we use our
+							**  own ARC validation result and should not
+							**  trust any other ARC result in AR headers.
+							*/
+							if (conf->conf_dolog)
+							{
+								syslog(LOG_INFO,
+								       "%s: ignoring ARC result %s found in "
+								       "authentication-results with our "
+								       "authserv-id",
+								       afc->mctx_jobid,
+								       ares_getresult(ar.ares_result[n]
+								                      .result_result));
+							}
+							continue;
+						}
+
 						/*
 						**  If it's an ARC result under
 						**  our authserv-id, use that
@@ -3673,15 +3693,16 @@ mlfi_eom(SMFICTX *ctx)
 						arfound += 1;
 						if (arfound > 1)
 						{
-							/* Assume that AR headers are being processed by
-							* the most recent first. If a message is transitioning
-							* between multiple systems in the same authserv-id then
-							* use the most recent one and skip the rest. */
+							/*  Assume that AR headers are being processed by
+							**  the most recent first. We trust only the most
+							**  recent one and skip the rest.
+							*/
 							if (conf->conf_dolog)
 							{
 								syslog(LOG_INFO,
-									"%s: ignoring earlier authentication-results %s in same authserv-id",
-									afc->mctx_jobid, ares_getresult(ar.ares_result[n].result_result));
+								       "%s: ignoring earlier authentication-results %s in same authserv-id",
+								       afc->mctx_jobid,
+								       ares_getresult(ar.ares_result[n].result_result));
 							}
 
 							continue;
